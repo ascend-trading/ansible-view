@@ -13,10 +13,51 @@ and execution-order numbering.
 
 ---
 
-## Getting started (clone & run)
+## Installation
 
-No pip install needed. Just clone and run — the wrapper script sets up the
-virtual environment automatically on first use:
+### Into your existing Ansible environment (recommended)
+
+If you already have Ansible installed, install `ansible-view` into the same
+environment so it shares the same `ansible-core` and config:
+
+```bash
+# If ansible is in a virtualenv (most common)
+source /path/to/your/ansible-venv/bin/activate
+pip install ansible-view
+
+# If ansible is installed via pip at the user level
+pip install --user ansible-view
+
+# If ansible is installed via pipx
+pipx inject ansible ansible-view
+```
+
+Then run it from anywhere against any playbook:
+
+```bash
+ansible-view site.yml
+ansible-view /srv/ansible/playbooks/deploy.yml
+```
+
+### As an isolated tool (pipx)
+
+[pipx](https://pipx.pypa.io) installs CLI tools in isolated environments so
+they don't interfere with your system Python or existing packages:
+
+```bash
+pipx install ansible-view
+ansible-view site.yml
+```
+
+> `ansible-view` requires `ansible-core` as a dependency. pipx will install
+> it into the isolated environment automatically. If you want it to use your
+> system Ansible config, set `ANSIBLE_CONFIG` or `ANSIBLE_ROLES_PATH` as
+> you normally would — these are read from the environment regardless of
+> where `ansible-view` is installed.
+
+### Clone and run (no install at all)
+
+For contributing or trying it out without touching your Python environment:
 
 ```bash
 git clone https://github.com/aimev65/ansible-view
@@ -24,23 +65,8 @@ cd ansible-view
 ./bin/ansible-view examples/webapp/site.yml
 ```
 
-The first invocation installs all dependencies into `.venv`. Subsequent runs
-are instant.
-
-### Or with `make`
-
-```bash
-make setup                                  # create .venv, install dependencies
-source .venv/bin/activate
-ansible-view examples/webapp/site.yml
-```
-
-### Or via pip (published package)
-
-```bash
-pip install ansible-view
-ansible-view site.yml
-```
+The wrapper auto-creates a local `.venv` and installs dependencies on first
+run. Subsequent runs are instant. Use `make setup` for the same result.
 
 ---
 

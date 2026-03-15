@@ -8,28 +8,32 @@ mode using the examples in this directory.
 
 ## Setup
 
-The quickest path — no manual venv steps:
+Choose the method that fits your workflow:
 
+**Into your existing Ansible environment** (shares roles paths and config):
+```bash
+# virtualenv
+source /path/to/your/ansible-venv/bin/activate
+pip install ansible-view
+
+# user-level pip
+pip install --user ansible-view
+
+# ansible installed via pipx
+pipx inject ansible ansible-view
+```
+
+**Isolated install via pipx** (no environment conflicts):
+```bash
+pipx install ansible-view
+```
+
+**Clone and run** (no install — good for trying it out):
 ```bash
 git clone https://github.com/aimev65/ansible-view
 cd ansible-view
 ./bin/ansible-view examples/minimal/site.yml
-```
-
-The wrapper auto-creates `.venv` and installs dependencies on first run.
-
-Alternatively, use `make`:
-
-```bash
-make setup
-source .venv/bin/activate
-ansible-view examples/minimal/site.yml
-```
-
-Or install from PyPI:
-
-```bash
-pip install ansible-view
+# first run auto-creates .venv; subsequent runs are instant
 ```
 
 ---
