@@ -1,0 +1,21 @@
+---
+- name: Check if migrations are needed
+  command: "{{ app_dir }}/current/bin/db-status"
+  register: db_status
+  changed_when: false
+  failed_when: false
+
+- name: Run pending migrations
+  command: "{{ app_dir }}/current/bin/migrate"
+  become_user: "{{ app_user }}"
+  when:
+    - db_status.rc == 0
+    - "'pending' in db_status.stdout"
+  register: migration_result
+  tags: [app, migrate]
+
+- name: Log migration result
+  debug:
+    msg: "Migration output: {{ migration_result.stdout | default('no migrations run') }}"
+  when: migration_result is defined
+  tags: [app, migrate]

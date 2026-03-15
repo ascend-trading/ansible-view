@@ -1,0 +1,10 @@
+---
+- name: Allow HTTP through firewall
+  community.general.ufw:
+    rule: allow
+    port: "{{ http_port }}"
+    proto: tcp
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled

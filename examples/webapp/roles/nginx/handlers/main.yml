@@ -1,0 +1,15 @@
+---
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+
+- name: test nginx config
+  command: nginx -t
+  register: nginx_test
+  failed_when: nginx_test.rc != 0

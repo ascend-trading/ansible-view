@@ -1,0 +1,31 @@
+---
+- name: Create nginx config directory
+  file:
+    path: /etc/nginx/conf.d
+    state: directory
+    mode: "0755"
+
+- name: Deploy nginx main config
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    validate: nginx -t -c %s
+  notify: restart nginx
+  register: nginx_config
+  tags: [nginx, config]
+
+- name: Deploy virtual host config
+  template:
+    src: vhost.conf.j2
+    dest: "/etc/nginx/conf.d/{{ domain_name }}.conf"
+    validate: nginx -t -c /etc/nginx/nginx.conf
+  notify: restart nginx
+  when: domain_name is defined
+  tags: [nginx, config]
+
+- name: Remove default nginx site
+  file:
+    path: /etc/nginx/sites-enabled/default
+    state: absent
+  notify: restart nginx
+  tags: [nginx, config]

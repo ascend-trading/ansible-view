@@ -1,0 +1,37 @@
+---
+- name: Install firewall (Debian)
+  apt:
+    name: ufw
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: [firewall, security]
+
+- name: Allow SSH
+  community.general.ufw:
+    rule: allow
+    port: "22"
+    proto: tcp
+  when: ansible_os_family == "Debian"
+  tags: [firewall, security]
+
+- name: Allow HTTP
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_port | default(80) }}"
+    proto: tcp
+  tags: [firewall, security]
+
+- name: Allow HTTPS
+  community.general.ufw:
+    rule: allow
+    port: "{{ nginx_ssl_port | default(443) }}"
+    proto: tcp
+  when: nginx_ssl_port is defined
+  tags: [firewall, security]
+
+- name: Enable UFW
+  community.general.ufw:
+    state: enabled
+    policy: deny
+  when: ansible_os_family == "Debian"
+  tags: [firewall, security]
