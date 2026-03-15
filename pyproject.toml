@@ -32,6 +32,7 @@ Homepage = "https://github.com/ansible-view/ansible-view"
 Repository = "https://github.com/ansible-view/ansible-view"
 Issues = "https://github.com/ansible-view/ansible-view/issues"
 
+[project]
 dependencies = [
   "ansible-core>=2.15",
   "PyYAML>=6.0",
