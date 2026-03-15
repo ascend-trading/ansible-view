@@ -18,18 +18,18 @@ and execution-order numbering.
 ### Into your existing Ansible environment (recommended)
 
 If you already have Ansible installed, install `ansible-view` into the same
-environment so it shares the same `ansible-core` and config:
+environment so it shares your roles paths and config:
 
 ```bash
 # If ansible is in a virtualenv (most common)
 source /path/to/your/ansible-venv/bin/activate
-pip install ansible-view
+pip install git+https://github.com/ascend-trading/ansible-view.git
 
-# If ansible is installed via pip at the user level
-pip install --user ansible-view
+# If ansible is installed at the user level
+pip install --user git+https://github.com/ascend-trading/ansible-view.git
 
 # If ansible is installed via pipx
-pipx inject ansible ansible-view
+pipx inject ansible git+https://github.com/ascend-trading/ansible-view.git
 ```
 
 Then run it from anywhere against any playbook:
@@ -45,22 +45,28 @@ ansible-view /srv/ansible/playbooks/deploy.yml
 they don't interfere with your system Python or existing packages:
 
 ```bash
-pipx install ansible-view
+pipx install git+https://github.com/ascend-trading/ansible-view.git
 ansible-view site.yml
 ```
 
 > `ansible-view` requires `ansible-core` as a dependency. pipx will install
-> it into the isolated environment automatically. If you want it to use your
-> system Ansible config, set `ANSIBLE_CONFIG` or `ANSIBLE_ROLES_PATH` as
-> you normally would — these are read from the environment regardless of
-> where `ansible-view` is installed.
+> it automatically. `ANSIBLE_CONFIG`, `ANSIBLE_ROLES_PATH`, and other env
+> vars are read from your shell regardless of where the tool is installed.
+
+### From a specific release
+
+To pin to a release rather than the latest commit:
+
+```bash
+pip install https://github.com/ascend-trading/ansible-view/releases/download/v0.1.0/ansible_view-0.1.0-py3-none-any.whl
+```
 
 ### Clone and run (no install at all)
 
 For contributing or trying it out without touching your Python environment:
 
 ```bash
-git clone https://github.com/aimev65/ansible-view
+git clone https://github.com/ascend-trading/ansible-view.git
 cd ansible-view
 ./bin/ansible-view examples/webapp/site.yml
 ```

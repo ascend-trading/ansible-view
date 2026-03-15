@@ -14,18 +14,18 @@ Choose the method that fits your workflow:
 ```bash
 # virtualenv
 source /path/to/your/ansible-venv/bin/activate
-pip install ansible-view
+pip install git+https://github.com/ascend-trading/ansible-view.git
 
 # user-level pip
-pip install --user ansible-view
+pip install --user git+https://github.com/ascend-trading/ansible-view.git
 
 # ansible installed via pipx
-pipx inject ansible ansible-view
+pipx inject ansible git+https://github.com/ascend-trading/ansible-view.git
 ```
 
 **Isolated install via pipx** (no environment conflicts):
 ```bash
-pipx install ansible-view
+pipx install git+https://github.com/ascend-trading/ansible-view.git
 ```
 
 **Clone and run** (no install — good for trying it out):
