@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# ansible-view bootstrap wrapper
+# Run directly after cloning — no manual venv setup required.
+# First invocation creates .venv and installs dependencies automatically.
+set -e
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
+VENV="$ROOT/.venv"
+
+if [ ! -x "$VENV/bin/ansible-view" ]; then
+    echo "[ansible-view] First run — setting up virtual environment..."
+    python3 -m venv "$VENV"
+    "$VENV/bin/pip" install --quiet -e "$ROOT"
+    echo "[ansible-view] Ready."
+    echo ""
+fi
+
+exec "$VENV/bin/ansible-view" "$@"
