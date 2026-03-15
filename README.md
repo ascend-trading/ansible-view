@@ -15,64 +15,77 @@ and execution-order numbering.
 
 ## Installation
 
-### Into your existing Ansible environment (recommended)
+### Clone and run — no permissions required (recommended on shared systems)
 
-If you already have Ansible installed, install `ansible-view` into the same
-environment so it shares your roles paths and config:
+The simplest path on any system, including shared or root-owned Ansible
+environments. No write access to any existing Python installation needed:
 
 ```bash
-# If ansible is in a virtualenv (most common)
+git clone https://github.com/ascend-trading/ansible-view.git
+cd ansible-view
+./bin/ansible-view /path/to/your/playbook.yml
+```
+
+The wrapper creates a self-contained `.venv` inside the cloned directory on
+first run and never touches your system Python or existing virtualenv.
+Subsequent runs are instant.
+
+Set an alias so you can call it from anywhere:
+
+```bash
+echo 'alias ansible-view="/path/to/ansible-view/bin/ansible-view"' >> ~/.bashrc
+source ~/.bashrc
+ansible-view site.yml
+```
+
+### Into your own virtualenv
+
+Create a dedicated virtualenv for `ansible-view` so it doesn't conflict with
+your existing Ansible installation:
+
+```bash
+python3 -m venv ~/ansible-view-env
+~/ansible-view-env/bin/pip install git+https://github.com/ascend-trading/ansible-view.git
+~/ansible-view-env/bin/ansible-view site.yml
+```
+
+Or alias it:
+```bash
+echo 'alias ansible-view="$HOME/ansible-view-env/bin/ansible-view"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Into your existing Ansible virtualenv
+
+Only use this if your virtualenv is writable by your user. If you get a
+**Permission denied** error (e.g. the venv is at `/opt/...` or owned by root),
+use one of the options above instead.
+
+```bash
 source /path/to/your/ansible-venv/bin/activate
 pip install git+https://github.com/ascend-trading/ansible-view.git
-
-# If ansible is installed at the user level
-pip install --user git+https://github.com/ascend-trading/ansible-view.git
-
-# If ansible is installed via pipx
-pipx inject ansible git+https://github.com/ascend-trading/ansible-view.git
 ```
 
-Then run it from anywhere against any playbook:
+### Via pipx (if available)
 
-```bash
-ansible-view site.yml
-ansible-view /srv/ansible/playbooks/deploy.yml
-```
-
-### As an isolated tool (pipx)
-
-[pipx](https://pipx.pypa.io) installs CLI tools in isolated environments so
-they don't interfere with your system Python or existing packages:
+[pipx](https://pipx.pypa.io) installs CLI tools in fully isolated
+environments. If `pipx` isn't installed, see
+[pipx installation](https://pipx.pypa.io/stable/installation/).
 
 ```bash
 pipx install git+https://github.com/ascend-trading/ansible-view.git
 ansible-view site.yml
 ```
 
-> `ansible-view` requires `ansible-core` as a dependency. pipx will install
-> it automatically. `ANSIBLE_CONFIG`, `ANSIBLE_ROLES_PATH`, and other env
-> vars are read from your shell regardless of where the tool is installed.
+> `ANSIBLE_CONFIG`, `ANSIBLE_ROLES_PATH`, and all other Ansible env vars
+> work regardless of which install method you use — they're read from your
+> shell environment at runtime.
 
 ### From a specific release
-
-To pin to a release rather than the latest commit:
 
 ```bash
 pip install https://github.com/ascend-trading/ansible-view/releases/download/v0.1.0/ansible_view-0.1.0-py3-none-any.whl
 ```
-
-### Clone and run (no install at all)
-
-For contributing or trying it out without touching your Python environment:
-
-```bash
-git clone https://github.com/ascend-trading/ansible-view.git
-cd ansible-view
-./bin/ansible-view examples/webapp/site.yml
-```
-
-The wrapper auto-creates a local `.venv` and installs dependencies on first
-run. Subsequent runs are instant. Use `make setup` for the same result.
 
 ---
 

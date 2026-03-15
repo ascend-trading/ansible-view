@@ -8,33 +8,29 @@ mode using the examples in this directory.
 
 ## Setup
 
-Choose the method that fits your workflow:
-
-**Into your existing Ansible environment** (shares roles paths and config):
+**Clone and run — works everywhere, no permissions needed (recommended):**
 ```bash
-# virtualenv
-source /path/to/your/ansible-venv/bin/activate
-pip install git+https://github.com/ascend-trading/ansible-view.git
-
-# user-level pip
-pip install --user git+https://github.com/ascend-trading/ansible-view.git
-
-# ansible installed via pipx
-pipx inject ansible git+https://github.com/ascend-trading/ansible-view.git
+git clone https://github.com/ascend-trading/ansible-view.git
+cd ansible-view
+./bin/ansible-view examples/minimal/site.yml
+# first run auto-creates .venv inside the repo; subsequent runs are instant
 ```
 
-**Isolated install via pipx** (no environment conflicts):
+**Into your own virtualenv:**
+```bash
+python3 -m venv ~/ansible-view-env
+~/ansible-view-env/bin/pip install git+https://github.com/ascend-trading/ansible-view.git
+~/ansible-view-env/bin/ansible-view examples/minimal/site.yml
+```
+
+**Via pipx** (if available):
 ```bash
 pipx install git+https://github.com/ascend-trading/ansible-view.git
 ```
 
-**Clone and run** (no install — good for trying it out):
-```bash
-git clone https://github.com/aimev65/ansible-view
-cd ansible-view
-./bin/ansible-view examples/minimal/site.yml
-# first run auto-creates .venv; subsequent runs are instant
-```
+> If you get a **Permission denied** error when pip-installing, your Ansible
+> virtualenv is likely owned by root. Use the clone-and-run method above —
+> it requires no write access to any existing environment.
 
 ---
 
