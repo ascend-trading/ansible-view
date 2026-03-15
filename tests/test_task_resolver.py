@@ -133,9 +133,7 @@ def test_fqcn_import_role(tmp_path: Path):
     """ansible.builtin.import_role (FQCN) should be handled like import_role."""
     roles_dir = tmp_path / "roles" / "myrole" / "tasks"
     roles_dir.mkdir(parents=True)
-    (roles_dir / "main.yml").write_text(
-        "- name: role task\n  debug: {msg: hi}\n", encoding="utf-8"
-    )
+    (roles_dir / "main.yml").write_text("- name: role task\n  debug: {msg: hi}\n", encoding="utf-8")
 
     resolver = _make_resolver(tmp_path)
     tasks = [{"ansible.builtin.import_role": {"name": "myrole"}}]
@@ -149,9 +147,7 @@ def test_fqcn_include_role(tmp_path: Path):
     """ansible.builtin.include_role (FQCN) should be handled like include_role."""
     roles_dir = tmp_path / "roles" / "otherrole" / "tasks"
     roles_dir.mkdir(parents=True)
-    (roles_dir / "main.yml").write_text(
-        "- name: other task\n  debug: {msg: y}\n", encoding="utf-8"
-    )
+    (roles_dir / "main.yml").write_text("- name: other task\n  debug: {msg: y}\n", encoding="utf-8")
 
     resolver = _make_resolver(tmp_path)
     tasks = [{"ansible.builtin.include_role": {"name": "otherrole"}}]
@@ -192,9 +188,7 @@ def test_import_tasks_fallback_to_base_dir(tmp_path: Path):
     role_tasks_dir.mkdir(parents=True)
 
     tasks = [{"import_tasks": "tasks/common.yml"}]
-    nodes = resolver.parse_task_list(
-        tasks, parent_file=str(role_tasks_dir / "main.yml")
-    )
+    nodes = resolver.parse_task_list(tasks, parent_file=str(role_tasks_dir / "main.yml"))
 
     assert len(nodes) == 1
     node = nodes[0]
