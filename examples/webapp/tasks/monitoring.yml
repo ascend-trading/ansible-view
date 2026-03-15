@@ -1,0 +1,25 @@
+---
+- name: Install node exporter
+  apt:
+    name: prometheus-node-exporter
+    state: present
+  when: ansible_os_family == "Debian"
+  register: node_exporter_installed
+  tags: [monitoring]
+
+- name: Configure node exporter
+  template:
+    src: node_exporter.service.j2
+    dest: /etc/systemd/system/node_exporter.service
+  notify: restart node_exporter
+  when: node_exporter_installed.changed
+  tags: [monitoring]
+
+- name: Open monitoring port in firewall
+  community.general.ufw:
+    rule: allow
+    port: "9100"
+    proto: tcp
+    src: "{{ monitor_host | default('127.0.0.1') }}"
+  when: ansible_os_family == "Debian"
+  tags: [monitoring, firewall]

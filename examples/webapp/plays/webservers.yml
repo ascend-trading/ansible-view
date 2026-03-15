@@ -1,0 +1,29 @@
+---
+# Web server play — installs and configures nginx as a reverse proxy
+- name: Configure web servers
+  hosts: webservers
+  become: true
+  vars:
+    nginx_port: 80
+    nginx_ssl_port: 443
+    domain_name: example.com
+
+  pre_tasks:
+    - name: Ensure firewall is present
+      include_tasks: ../tasks/firewall.yml
+
+  roles:
+    - role: nginx
+      tasks_from: main.yml
+
+  tasks:
+    - name: Configure SSL certificates
+      include_tasks: ../tasks/ssl.yml
+      when: nginx_ssl_port is defined
+      tags: [ssl, security]
+
+  handlers:
+    - name: reload nginx
+      service:
+        name: nginx
+        state: reloaded

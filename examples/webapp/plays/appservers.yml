@@ -1,0 +1,52 @@
+---
+# Application server play — deploys the app and manages the service
+- name: Deploy application servers
+  hosts: appservers
+  become: true
+  vars:
+    app_user: deploy
+    app_dir: /opt/webapp
+    app_version: "{{ lookup('env', 'APP_VERSION') | default('latest') }}"
+    app_port: 8080
+    db_host: "{{ groups['dbservers'][0] }}"
+
+  roles:
+    - role: common
+    - role: app
+      tasks_from: main.yml
+      handlers_from: main.yml
+
+  tasks:
+    - name: Configure monitoring
+      include_tasks: ../tasks/monitoring.yml
+      vars:
+        monitor_port: "{{ app_port }}"
+      tags: [monitoring]
+
+    - name: Run smoke tests
+      block:
+        - name: Wait for app to start
+          wait_for:
+            port: "{{ app_port }}"
+            timeout: 30
+
+        - name: Check health endpoint
+          uri:
+            url: "http://localhost:{{ app_port }}/health"
+            status_code: 200
+          register: health_check
+
+      rescue:
+        - name: Collect app logs on failure
+          command: journalctl -u webapp --no-pager -n 50
+          register: app_logs
+
+        - name: Fail with log output
+          fail:
+            msg: "App failed to start. Logs:\n{{ app_logs.stdout }}"
+
+      always:
+        - name: Record deploy timestamp
+          copy:
+            content: "{{ ansible_date_time.iso8601 }}"
+            dest: "{{ app_dir }}/last_deploy"

@@ -1,0 +1,47 @@
+---
+- name: Create app directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ app_user }}"
+    mode: "0755"
+  loop:
+    - "{{ app_dir }}"
+    - "{{ app_dir }}/releases"
+    - "{{ app_dir }}/shared"
+    - "{{ app_dir }}/shared/config"
+    - "{{ app_dir }}/shared/logs"
+
+- name: Download application release
+  get_url:
+    url: "https://releases.example.com/webapp/{{ app_version }}.tar.gz"
+    dest: "{{ app_dir }}/releases/{{ app_version }}.tar.gz"
+    checksum: "sha256:{{ app_checksum | default(omit) }}"
+  register: app_download
+  tags: [app, deploy]
+
+- name: Extract release
+  unarchive:
+    src: "{{ app_dir }}/releases/{{ app_version }}.tar.gz"
+    dest: "{{ app_dir }}/releases/"
+    remote_src: true
+  when: app_download.changed
+  register: app_extracted
+  tags: [app, deploy]
+
+- name: Update current symlink
+  file:
+    src: "{{ app_dir }}/releases/{{ app_version }}"
+    dest: "{{ app_dir }}/current"
+    state: link
+  notify: restart webapp
+  tags: [app, deploy]
+
+- name: Deploy application config
+  template:
+    src: app_config.yml.j2
+    dest: "{{ app_dir }}/shared/config/config.yml"
+    owner: "{{ app_user }}"
+    mode: "0640"
+  notify: restart webapp
+  tags: [app, config]

@@ -1,0 +1,5 @@
+---
+app_user: deploy
+app_dir: /opt/webapp
+app_version: latest
+app_port: 8080

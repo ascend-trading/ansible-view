@@ -1,0 +1,34 @@
+---
+# Install base system packages
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 3600
+  when: ansible_os_family == "Debian"
+  tags: [packages]
+
+- name: Install common packages (Debian)
+  apt:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - vim
+      - htop
+    state: present
+  when: ansible_os_family == "Debian"
+  tags: [packages]
+
+- name: Install common packages (RedHat)
+  yum:
+    name:
+      - curl
+      - wget
+      - git
+      - unzip
+      - vim
+      - htop
+    state: present
+  when: ansible_os_family == "RedHat"
+  tags: [packages]

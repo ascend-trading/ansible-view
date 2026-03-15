@@ -1,0 +1,10 @@
+---
+- name: restart cron
+  service:
+    name: cron
+    state: restarted
+
+- name: restart ntp
+  service:
+    name: ntp
+    state: restarted

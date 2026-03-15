@@ -1,0 +1,9 @@
+---
+# Nginx role — installs, configures, and starts nginx
+- name: Install nginx
+  import_tasks: install.yml
+  tags: [nginx, packages]
+
+- name: Configure nginx
+  import_tasks: configure.yml
+  tags: [nginx, config]

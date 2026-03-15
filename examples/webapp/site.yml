@@ -1,0 +1,7 @@
+---
+# site.yml — main entry point for the webapp deployment
+# Run: ansible-view examples/webapp/site.yml
+
+- import_playbook: plays/base.yml
+- import_playbook: plays/webservers.yml
+- import_playbook: plays/appservers.yml

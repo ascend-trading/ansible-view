@@ -1,0 +1,6 @@
+---
+nginx_port: 80
+nginx_ssl_port: 443
+nginx_worker_processes: auto
+nginx_worker_connections: 1024
+domain_name: localhost

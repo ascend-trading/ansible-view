@@ -1,0 +1,26 @@
+---
+# Common tasks — applied to every host
+- name: Install base packages
+  import_tasks: packages.yml
+  tags: [packages]
+
+- name: Set system timezone
+  community.general.timezone:
+    name: "{{ timezone | default('UTC') }}"
+  notify: restart cron
+  tags: [system]
+
+- name: Configure NTP
+  template:
+    src: ntp.conf.j2
+    dest: /etc/ntp.conf
+  when: ansible_os_family == "Debian"
+  notify: restart ntp
+  tags: [system, ntp]
+
+- name: Ensure log directory exists
+  file:
+    path: /var/log/webapp
+    state: directory
+    mode: "0755"
+  tags: [system]

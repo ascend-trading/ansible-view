@@ -1,0 +1,27 @@
+---
+# Base play — runs on all hosts to apply common configuration
+- name: Base configuration
+  hosts: all
+  become: true
+  gather_facts: true
+  vars:
+    ntp_server: pool.ntp.org
+    timezone: UTC
+
+  pre_tasks:
+    - name: Verify supported OS
+      assert:
+        that:
+          - ansible_os_family in ["Debian", "RedHat"]
+        fail_msg: "Unsupported OS: {{ ansible_os_family }}"
+      tags: [always]
+
+  roles:
+    - common
+
+  post_tasks:
+    - name: Mark host as configured
+      file:
+        path: /etc/ansible-managed
+        state: touch
+      tags: [always]
