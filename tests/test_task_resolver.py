@@ -102,6 +102,7 @@ def test_collect_variables_from_when():
 # FQCN dispatch tests
 # ---------------------------------------------------------------------------
 
+
 def test_fqcn_import_tasks(tmp_path: Path):
     """ansible.builtin.import_tasks (FQCN) should be handled like import_tasks."""
     resolver = _make_resolver(tmp_path)
@@ -132,7 +133,9 @@ def test_fqcn_import_role(tmp_path: Path):
     """ansible.builtin.import_role (FQCN) should be handled like import_role."""
     roles_dir = tmp_path / "roles" / "myrole" / "tasks"
     roles_dir.mkdir(parents=True)
-    (roles_dir / "main.yml").write_text("- name: role task\n  debug: {msg: hi}\n", encoding="utf-8")
+    (roles_dir / "main.yml").write_text(
+        "- name: role task\n  debug: {msg: hi}\n", encoding="utf-8"
+    )
 
     resolver = _make_resolver(tmp_path)
     tasks = [{"ansible.builtin.import_role": {"name": "myrole"}}]
@@ -146,7 +149,9 @@ def test_fqcn_include_role(tmp_path: Path):
     """ansible.builtin.include_role (FQCN) should be handled like include_role."""
     roles_dir = tmp_path / "roles" / "otherrole" / "tasks"
     roles_dir.mkdir(parents=True)
-    (roles_dir / "main.yml").write_text("- name: other task\n  debug: {msg: y}\n", encoding="utf-8")
+    (roles_dir / "main.yml").write_text(
+        "- name: other task\n  debug: {msg: y}\n", encoding="utf-8"
+    )
 
     resolver = _make_resolver(tmp_path)
     tasks = [{"ansible.builtin.include_role": {"name": "otherrole"}}]
@@ -168,6 +173,8 @@ def test_fqcn_block(tmp_path: Path):
 
     assert len(nodes) == 1
     assert nodes[0].node_type == "block"
+    assert len(nodes[0].children) == 1
+    assert nodes[0].children[0].name == "inside"
 
 
 def test_import_tasks_fallback_to_base_dir(tmp_path: Path):

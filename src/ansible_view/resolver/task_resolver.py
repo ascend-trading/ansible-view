@@ -110,7 +110,7 @@ class TaskResolver:
             action_key = _find_action_key(task)
             bare = _bare(action_key) if action_key else None
             if bare == "block":
-                nodes.append(self._parse_block(task, parent_file))
+                nodes.append(self._parse_block(task, parent_file, action_key))
             elif bare in ("include_tasks", "import_tasks"):
                 nodes.append(self._parse_include_tasks(task, parent_file, action_key))
             elif bare in ("include_role", "import_role"):
@@ -121,7 +121,13 @@ class TaskResolver:
                 nodes.append(self._parse_standard_task(task, parent_file, task_kind))
         return nodes
 
-    def _parse_block(self, task: Dict[str, Any], parent_file: Optional[str]) -> Node:
+    def _parse_block(
+        self,
+        task: Dict[str, Any],
+        parent_file: Optional[str],
+        action_key: Optional[str] = None,
+    ) -> Node:
+        block_key = action_key or "block"
         name = task.get("name", "block")
         node = Node(
             name=name,
@@ -130,7 +136,7 @@ class TaskResolver:
             line_number=get_line_number(task),
         )
         children: List[Node] = []
-        block_tasks = task.get("block") or []
+        block_tasks = task.get(block_key) or []
         children.extend(self.parse_task_list(block_tasks, parent_file=parent_file))
         rescue_tasks = task.get("rescue") or []
         if rescue_tasks:
