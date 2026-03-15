@@ -120,7 +120,7 @@ class AnsibleViewApp(App):
     def _add_tree_node(self, parent, node: Node) -> None:
         label = self._label_for(node)
         if node.error:
-            label = f"{label} ERROR: {node.error}"
+            label = f"[bold red]![/bold red] {label}"
         tree_node = parent.add(label, data=node)
         if node.has_lazy_children():
             tree_node.allow_expand = True

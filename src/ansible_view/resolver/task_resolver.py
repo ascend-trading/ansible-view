@@ -38,6 +38,32 @@ KNOWN_TASK_KEYS = {
     "role",
 }
 
+# Bare action names that trigger special parsing (dispatch table keys).
+# Matched against the last dotted segment so FQCN forms like
+# ansible.builtin.import_role are handled transparently.
+_DISPATCH_ACTIONS = {
+    "block",
+    "include_tasks",
+    "import_tasks",
+    "include_role",
+    "import_role",
+    "include_playbook",
+    "import_playbook",
+}
+
+
+def _bare(key: str) -> str:
+    """Return the bare action name, stripping any FQCN prefix."""
+    return key.rsplit(".", 1)[-1]
+
+
+def _find_action_key(task: Dict[str, Any]) -> Optional[str]:
+    """Return the first task key whose bare name is a dispatch action, or None."""
+    for key in task:
+        if _bare(key) in _DISPATCH_ACTIONS:
+            return key
+    return None
+
 
 class TaskResolver:
     def __init__(self, base_dir: str, role_resolver: RoleResolver):
@@ -81,22 +107,27 @@ class TaskResolver:
                     )
                 )
                 continue
-            if "block" in task:
-                nodes.append(self._parse_block(task, parent_file))
-                continue
-            if "include_tasks" in task or "import_tasks" in task:
-                nodes.append(self._parse_include_tasks(task, parent_file))
-                continue
-            if "include_role" in task or "import_role" in task:
-                nodes.append(self._parse_include_role(task, parent_file))
-                continue
-            if "include_playbook" in task or "import_playbook" in task:
-                nodes.append(self._parse_include_playbook(task, parent_file))
-                continue
-            nodes.append(self._parse_standard_task(task, parent_file, task_kind))
+            action_key = _find_action_key(task)
+            bare = _bare(action_key) if action_key else None
+            if bare == "block":
+                nodes.append(self._parse_block(task, parent_file, action_key))
+            elif bare in ("include_tasks", "import_tasks"):
+                nodes.append(self._parse_include_tasks(task, parent_file, action_key))
+            elif bare in ("include_role", "import_role"):
+                nodes.append(self._parse_include_role(task, parent_file, action_key))
+            elif bare in ("include_playbook", "import_playbook"):
+                nodes.append(self._parse_include_playbook(task, parent_file, action_key))
+            else:
+                nodes.append(self._parse_standard_task(task, parent_file, task_kind))
         return nodes
 
-    def _parse_block(self, task: Dict[str, Any], parent_file: Optional[str]) -> Node:
+    def _parse_block(
+        self,
+        task: Dict[str, Any],
+        parent_file: Optional[str],
+        action_key: Optional[str] = None,
+    ) -> Node:
+        block_key = action_key or "block"
         name = task.get("name", "block")
         node = Node(
             name=name,
@@ -105,7 +136,7 @@ class TaskResolver:
             line_number=get_line_number(task),
         )
         children: List[Node] = []
-        block_tasks = task.get("block") or []
+        block_tasks = task.get(block_key) or []
         children.extend(self.parse_task_list(block_tasks, parent_file=parent_file))
         rescue_tasks = task.get("rescue") or []
         if rescue_tasks:
@@ -120,9 +151,14 @@ class TaskResolver:
         node.children = children
         return node
 
-    def _parse_include_tasks(self, task: Dict[str, Any], parent_file: Optional[str]) -> Node:
-        is_import = "import_tasks" in task
-        key = "import_tasks" if is_import else "include_tasks"
+    def _parse_include_tasks(
+        self,
+        task: Dict[str, Any],
+        parent_file: Optional[str],
+        action_key: Optional[str] = None,
+    ) -> Node:
+        key = action_key or ("import_tasks" if "import_tasks" in task else "include_tasks")
+        is_import = _bare(key) == "import_tasks"
         include_value = task.get(key)
         include_path = None
         if isinstance(include_value, str):
@@ -131,7 +167,7 @@ class TaskResolver:
             include_path = include_value.get("file") or include_value.get("name")
         include_path = include_path or "<unknown>"
 
-        node_type = "import_tasks" if is_import else "include_tasks"
+        node_type = "import_tasks" if is_import else "include_tasks"  # always bare
         task_name = task.get("name")
         display_name = (
             f"{task_name} ({include_path})" if task_name else f"{node_type}: {include_path}"
@@ -161,9 +197,14 @@ class TaskResolver:
         node.set_child_loader(load_children)
         return node
 
-    def _parse_include_role(self, task: Dict[str, Any], parent_file: Optional[str]) -> Node:
-        is_import = "import_role" in task
-        key = "import_role" if is_import else "include_role"
+    def _parse_include_role(
+        self,
+        task: Dict[str, Any],
+        parent_file: Optional[str],
+        action_key: Optional[str] = None,
+    ) -> Node:
+        key = action_key or ("import_role" if "import_role" in task else "include_role")
+        is_import = _bare(key) == "import_role"
         role_spec = task.get(key)
         role_name = None
         collection = None
@@ -178,7 +219,7 @@ class TaskResolver:
             handlers_from = role_spec.get("handlers_from")
         role_name = role_name or "<unknown>"
 
-        node_type = "import_role" if is_import else "include_role"
+        node_type = "import_role" if is_import else "include_role"  # always bare
         node = self.role_resolver.build_role_node(
             role_name,
             source_file=parent_file,
@@ -191,9 +232,14 @@ class TaskResolver:
         self._apply_task_metadata(node, task)
         return node
 
-    def _parse_include_playbook(self, task: Dict[str, Any], parent_file: Optional[str]) -> Node:
-        is_import = "import_playbook" in task
-        key = "import_playbook" if is_import else "include_playbook"
+    def _parse_include_playbook(
+        self,
+        task: Dict[str, Any],
+        parent_file: Optional[str],
+        action_key: Optional[str] = None,
+    ) -> Node:
+        key = action_key or ("import_playbook" if "import_playbook" in task else "include_playbook")
+        is_import = _bare(key) == "import_playbook"
         value = task.get(key)
         include_path = value if isinstance(value, str) else None
         include_path = include_path or "<unknown>"
