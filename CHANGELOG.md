@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## [0.1.1] - 2026-03-16
+
+### Fixed
+- Resolve FQCN task actions and fallback include path to playbook root
+
+### Changed
+- Install instructions updated to use `pip install git+...` (PyPI publishing pending)
+- Clarified install docs for shared/root-owned Ansible environments
+
 ## [0.1.0] - 2026-03-15
 
 ### Added
