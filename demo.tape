@@ -7,72 +7,183 @@ Set Theme "Catppuccin Mocha"
 Set TypingSpeed 40ms
 Set Padding 16
 
-# ── 1. intro ──────────────────────────────────────────────────────────────────
-Type "# ansible-view — inspect any Ansible playbook from the terminal"
-Sleep 1.5s
+# ── 1. --tree: minimal example ────────────────────────────────────────────────
+Type "ansible-view --tree examples/minimal/site.yml"
+Sleep 600ms
+Enter
+Sleep 2.5s
+
+# ── 2. --execution: minimal example ──────────────────────────────────────────
+Type "ansible-view --execution examples/minimal/site.yml"
+Sleep 600ms
+Enter
+Sleep 2.5s
+
+# ── 3. --tree: full webapp (multi-play, roles, nested includes) ───────────────
+Type "ansible-view --tree examples/webapp/site.yml"
+Sleep 600ms
+Enter
+Sleep 3s
+
+# ── 4. TUI: interactive view of the webapp playbook ──────────────────────────
+Type "ansible-view examples/webapp/site.yml"
+Sleep 600ms
+Enter
+Sleep 3s
+
+# --- root is visible: 3 import_playbook entries ---
+# expand first import_playbook: plays/base.yml
+Down
+Sleep 400ms
+Enter
+Sleep 800ms
+
+# expand the play inside it
+Down
+Sleep 400ms
+Enter
+Sleep 800ms
+
+# step through pre_tasks, expand it
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Enter
+Sleep 600ms
+
+# step into the task inside pre_tasks
+Down
+Sleep 500ms
+
+# back out to role: common — expand it
+Down
+Sleep 300ms
+Enter
+Sleep 800ms
+
+# expand tasks/main.yml inside role
+Down
+Sleep 300ms
+Enter
+Sleep 700ms
+
+# drill into import_tasks: Install base packages
+Down
+Sleep 300ms
+Enter
+Sleep 700ms
+
+# expand packages.yml inside
+Down
+Sleep 300ms
+Enter
+Sleep 700ms
+
+# read through the leaf tasks
+Down
+Sleep 400ms
+Down
+Sleep 400ms
+Down
+Sleep 600ms
+
+# collapse packages.yml back up
 Enter
 Sleep 500ms
 
-# ── 2. tree mode — minimal example ───────────────────────────────────────────
-Type "ansible-view --tree examples/minimal/site.yml"
-Sleep 800ms
-Enter
-Sleep 2s
-
-# ── 3. execution order — minimal example ─────────────────────────────────────
-Type "ansible-view --execution examples/minimal/site.yml"
-Sleep 800ms
-Enter
-Sleep 2s
-
-# ── 4. tree mode — full webapp (multi-play, roles, includes) ──────────────────
-Type "# multi-play webapp: import_playbook + roles + nested includes"
-Sleep 1.2s
-Enter
+# collapse the import_tasks
+Up
 Sleep 300ms
-Type "ansible-view --tree examples/webapp/site.yml"
-Sleep 800ms
 Enter
-Sleep 3s
+Sleep 500ms
 
-# ── 5. TUI — interactive two-pane view ───────────────────────────────────────
-Type "# interactive TUI — navigate the tree and inspect YAML side by side"
-Sleep 1.2s
-Enter
+# collapse tasks/main.yml
+Up
 Sleep 300ms
-Type "ansible-view examples/minimal/site.yml"
-Sleep 800ms
 Enter
-Sleep 3s
+Sleep 500ms
 
-# navigate down through the tree
-Down
-Sleep 400ms
-Down
-Sleep 400ms
-Down
-Sleep 400ms
-Down
-Sleep 600ms
+# collapse role: common
+Up
+Sleep 300ms
+Enter
+Sleep 700ms
 
-# expand a node (Enter or Right)
-Right
-Sleep 1s
+# --- navigate down to the second import_playbook: webservers ---
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Down
+Sleep 300ms
 Down
 Sleep 400ms
-Down
-Sleep 600ms
+Enter
+Sleep 800ms
 
-# resize panels
-Type "["
+# expand the webservers play
+Down
+Sleep 300ms
+Enter
+Sleep 700ms
+
+# navigate down to the nginx role and expand it
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Enter
+Sleep 800ms
+
+# expand nginx tasks/main.yml
+Down
+Sleep 300ms
+Enter
+Sleep 700ms
+
+# scroll through the nested install + configure tasks
+Down
+Sleep 300ms
+Enter
 Sleep 600ms
-Type "["
-Sleep 600ms
+Down
+Sleep 300ms
+Down
+Sleep 300ms
+Down
+Sleep 400ms
+
+# --- switch to execution-order view ---
+Type "e"
+Sleep 1.5s
+
+# --- toggle debug info on a task ---
+Type "d"
+Sleep 1.5s
+
+# --- back to hierarchy view ---
+Type "e"
+Sleep 800ms
+Type "d"
+Sleep 800ms
+
+# --- resize panels ---
 Type "]"
-Sleep 600ms
+Sleep 500ms
 Type "]"
+Sleep 500ms
+Type "["
+Sleep 500ms
+Type "["
 Sleep 800ms
 
 # quit
 Type "q"
-Sleep 1s
+Sleep 800ms
