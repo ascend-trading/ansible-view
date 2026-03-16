@@ -11,6 +11,8 @@ No more opening five files to understand what a playbook actually does.
 into a single navigable view — with an interactive TUI, static tree output,
 and execution-order numbering.
 
+![ansible-view demo](demo.gif)
+
 ---
 
 ## Installation
