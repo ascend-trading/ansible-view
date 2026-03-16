@@ -7,183 +7,165 @@ Set Theme "Catppuccin Mocha"
 Set TypingSpeed 40ms
 Set Padding 16
 
-# ── 1. --tree: minimal example ────────────────────────────────────────────────
-Type "ansible-view --tree examples/minimal/site.yml"
-Sleep 600ms
-Enter
-Sleep 2.5s
-
-# ── 2. --execution: minimal example ──────────────────────────────────────────
-Type "ansible-view --execution examples/minimal/site.yml"
-Sleep 600ms
-Enter
-Sleep 2.5s
-
-# ── 3. --tree: full webapp (multi-play, roles, nested includes) ───────────────
+# ── 1. Static tree — quick orientation ────────────────────────────────────────
 Type "ansible-view --tree examples/webapp/site.yml"
 Sleep 600ms
 Enter
 Sleep 3s
 
-# ── 4. TUI: interactive view of the webapp playbook ──────────────────────────
+# ── 2. Launch interactive TUI ─────────────────────────────────────────────────
 Type "ansible-view examples/webapp/site.yml"
 Sleep 600ms
 Enter
 Sleep 3s
 
-# --- root is visible: 3 import_playbook entries ---
-# expand first import_playbook: plays/base.yml
-Down
+# Root expanded: 3 import_playbook entries visible. Cursor at root.
+
+# ── Drill into plays/base.yml ─────────────────────────────────────────────────
+Down        # → import_playbook: plays/base.yml
 Sleep 400ms
-Enter
+Enter       # expand → lazy load → play: Base configuration
+Sleep 1s
+
+Down        # → play: Base configuration
+Sleep 350ms
+Enter       # expand → play sections (pre_tasks, roles, post_tasks)
 Sleep 800ms
 
-# expand the play inside it
-Down
-Sleep 400ms
-Enter
+Down        # → navigate to pre_tasks
+Sleep 300ms
+Down        # → pre_tasks node
+Sleep 300ms
+Enter       # expand pre_tasks → Verify supported OS
+Sleep 700ms
+
+Down        # → Verify supported OS (right panel: assert source)
+Sleep 700ms
+
+# ── Drill into role: common → tasks/main.yml ──────────────────────────────────
+Down        # → role: common
+Sleep 300ms
+Enter       # expand → lazy load → tasks/main.yml
+Sleep 1s
+
+Down        # → tasks/main.yml
+Sleep 300ms
+Enter       # expand → Install base packages, Set system timezone, Configure NTP, Ensure log dir
 Sleep 800ms
 
-# step through pre_tasks, expand it
-Down
+# ── Drill into import_tasks: Install base packages → packages.yml ─────────────
+Down        # → import_tasks: Install base packages
+Sleep 350ms
+Enter       # expand → lazy load → packages.yml (file node)
+Sleep 900ms
+
+Down        # → packages.yml
+Sleep 350ms
+Enter       # expand → leaf tasks inside packages.yml
+Sleep 800ms
+
+Down        # → Update apt cache
+Sleep 500ms
+Down        # → Install common packages (Debian)
+Sleep 500ms
+Down        # → Install common packages (RedHat)
+Sleep 700ms
+
+# ── Reset tree, navigate to plays/webservers.yml ──────────────────────────────
+Type "h"
+Sleep 800ms
+
+Down        # → import_playbook: plays/base.yml
 Sleep 300ms
-Down
+Down        # → import_playbook: plays/webservers.yml
+Sleep 400ms
+Enter       # expand → lazy load → play: Configure web servers
+Sleep 1s
+
+Down        # → play: Configure web servers
+Sleep 350ms
+Enter       # expand → play sections (pre_tasks, roles, tasks, handlers)
+Sleep 800ms
+
+Down        # → navigate toward nginx role
 Sleep 300ms
-Enter
+Down        # ↓
+Sleep 300ms
+Down        # ↓
+Sleep 300ms
+Down        # → role: nginx
+Sleep 350ms
+Enter       # expand → lazy load → tasks/main.yml
+Sleep 1s
+
+# ── Drill into nginx tasks/main.yml ───────────────────────────────────────────
+Down        # → tasks/main.yml
+Sleep 300ms
+Enter       # expand → import_tasks: Install nginx, import_tasks: Configure nginx
+Sleep 800ms
+
+# ── Expand import_tasks: Install nginx → install.yml ─────────────────────────
+Down        # → import_tasks: Install nginx
+Sleep 350ms
+Enter       # expand → lazy load → install.yml (file node)
+Sleep 900ms
+
+Down        # → install.yml
+Sleep 350ms
+Enter       # expand → 3 tasks inside install.yml
+Sleep 800ms
+
+Down        # → Install nginx package (right panel: apt task source)
+Sleep 500ms
+Down        # → Install nginx (RedHat)
+Sleep 500ms
+Down        # → Enable nginx service
 Sleep 600ms
 
-# step into the task inside pre_tasks
-Down
-Sleep 500ms
+# ── Expand import_tasks: Configure nginx → configure.yml ──────────────────────
+Down        # → import_tasks: Configure nginx
+Sleep 400ms
+Enter       # expand → lazy load → configure.yml (file node)
+Sleep 900ms
 
-# back out to role: common — expand it
-Down
-Sleep 300ms
-Enter
+Down        # → configure.yml
+Sleep 350ms
+Enter       # expand → 4 tasks inside configure.yml
 Sleep 800ms
 
-# expand tasks/main.yml inside role
-Down
-Sleep 300ms
-Enter
-Sleep 700ms
-
-# drill into import_tasks: Install base packages
-Down
-Sleep 300ms
-Enter
-Sleep 700ms
-
-# expand packages.yml inside
-Down
-Sleep 300ms
-Enter
-Sleep 700ms
-
-# read through the leaf tasks
-Down
-Sleep 400ms
-Down
-Sleep 400ms
-Down
-Sleep 600ms
-
-# collapse packages.yml back up
-Enter
+Down        # → Create nginx config directory
 Sleep 500ms
-
-# collapse the import_tasks
-Up
-Sleep 300ms
-Enter
+Down        # → Deploy nginx main config (right panel: template source)
 Sleep 500ms
-
-# collapse tasks/main.yml
-Up
-Sleep 300ms
-Enter
+Down        # → Deploy virtual host config
 Sleep 500ms
-
-# collapse role: common
-Up
-Sleep 300ms
-Enter
+Down        # → Remove default nginx site
 Sleep 700ms
 
-# --- navigate down to the second import_playbook: webservers ---
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 400ms
-Enter
-Sleep 800ms
-
-# expand the webservers play
-Down
-Sleep 300ms
-Enter
-Sleep 700ms
-
-# navigate down to the nginx role and expand it
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Enter
-Sleep 800ms
-
-# expand nginx tasks/main.yml
-Down
-Sleep 300ms
-Enter
-Sleep 700ms
-
-# scroll through the nested install + configure tasks
-Down
-Sleep 300ms
-Enter
-Sleep 600ms
-Down
-Sleep 300ms
-Down
-Sleep 300ms
-Down
-Sleep 400ms
-
-# --- switch to execution-order view ---
+# ── Toggle execution-order view ───────────────────────────────────────────────
 Type "e"
 Sleep 1.5s
 
-# --- toggle debug info on a task ---
+# ── Toggle debug metadata panel ───────────────────────────────────────────────
 Type "d"
 Sleep 1.5s
 
-# --- back to hierarchy view ---
+# ── Back to hierarchy, dismiss debug ──────────────────────────────────────────
 Type "e"
-Sleep 800ms
+Sleep 700ms
 Type "d"
-Sleep 800ms
+Sleep 700ms
 
-# --- resize panels ---
+# ── Resize panels ─────────────────────────────────────────────────────────────
 Type "]"
-Sleep 500ms
+Sleep 400ms
 Type "]"
-Sleep 500ms
+Sleep 400ms
 Type "["
-Sleep 500ms
+Sleep 400ms
 Type "["
-Sleep 800ms
+Sleep 600ms
 
-# quit
+# ── Quit ──────────────────────────────────────────────────────────────────────
 Type "q"
 Sleep 800ms
